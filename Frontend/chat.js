@@ -1,3 +1,9 @@
+//implementing localstorage
+const savedUsername = localStorage.getItem("username")
+if(savedUsername){
+    document.getElementById("user").value = savedUsername
+}
+
 const container = document.getElementById("messages")
 async function displayMessages(){
   try{
@@ -20,6 +26,7 @@ document.getElementById("message-form").addEventListener("submit",async(e)=>{
   e.preventDefault() //prevents page from refreshing on form submission
   const message = document.getElementById("message").value;
   const user = document.getElementById("user").value;
+  localStorage.setItem("username",user)
   //Adding Validation to check both author and quote are added
   if (!message.trim() || !user.trim()) 
     { alert("Both message and user are required."); return;
@@ -37,7 +44,7 @@ document.getElementById("message-form").addEventListener("submit",async(e)=>{
     alert("Error: " + text);
   }
     alert("Message added!");
-     e.target.reset(); // clears the form
+     document.getElementById("message").value = ""; //clear the message field only 
      displayMessages() 
      } 
      
