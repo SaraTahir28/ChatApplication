@@ -1,0 +1,41 @@
+body {
+  font-family: sans-serif;
+  max-width: 600px;
+  margin: 20px auto;
+}
+
+h1 {
+  text-align: center;
+}
+
+#messages {
+  list-style: none;
+  padding: 0;
+  border: 1px solid #ccc;
+  min-height: 100px;
+  margin-bottom: 20px;
+}
+
+#messages li {
+  padding: 8px 10px;
+  border-bottom: 1px solid #eee;
+}
+
+#messages li:last-child {
+  border-bottom: none;
+}
+
+form {
+  display: flex;
+  gap: 8px;
+}
+
+form input[type="text"] {
+  flex: 1;
+  padding: 6px 8px;
+}
+
+button {
+  padding: 6px 12px;
+  cursor: pointer;
+}
