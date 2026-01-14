@@ -8,17 +8,31 @@ const port = process.env.PORT || 3000; //listen to port provided by the hosting 
 
 const messages = [] //iniializing an empty array of messages- only gets loaded with Post method for the first time 
 
+//The users object maps each userID(becomes a key with its own object) to a user profile object.
+const users ={} 
 //creating a post  message route and modifying the message object 
 app.post("/messages", (req, res) => {
-const {user, message} = req.body;    //Extracting the frontend data
+const {userID,user, message} = req.body;    //Extracting the frontend data
 const nextID = messages.length === 0 ? 1 : messages[messages.length-1].id +1 //if no messages  id =1 else increment as messages increase.
 const timestamp = Date.now()    //Generating a timestamps for when the server recives the message
 
+if(!Object.hasOwn(users,userID)){
+  users[userID] = {
+    userId: userID,
+    username: user
+  }
+}
+else {
+   if (users[userID].username !== user) { 
+    users[userID].username = user;
+   } }
+
 const newMessage = {   //Building New message object 
     id: nextID,
-    user: user,
     message: message,
-    timestamp: timestamp
+    timestamp: timestamp,
+    userId: userID,
+    username: users[userID].username //shows the updated name incase user changes the name 
 };
 //saving it in the messages array 
 messages.push(newMessage);

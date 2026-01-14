@@ -1,7 +1,17 @@
-//implementing localstorage
-const savedUsername = localStorage.getItem("username")
-if(savedUsername){
-    document.getElementById("user").value = savedUsername
+//implementing generating userID's
+function generateUserId(){
+  return crypto.randomUUID() //built-in Web API for generating random ID's
+}
+//Giving each browser a permanent identity.
+let userID = localStorage.getItem("userID")
+if(!userID){
+  userID =  generateUserId()
+  localStorage.setItem("userID",userID)
+}
+//to ensure name is still displaying on UI on page refresh 
+const savedName = localStorage.getItem("username");
+if (savedName) {
+  document.getElementById("user").value = savedName;
 }
 
 const container = document.getElementById("messages")
@@ -12,7 +22,7 @@ async function displayMessages(){
   container.innerHTML=""
     for(const i of data){
         const list = document.createElement("li")
-            list.textContent = `${i.user}: ${i.message}`;
+            list.textContent = `${i.username}: ${i.message}`;
             container.append(list)
     }
 }
@@ -35,7 +45,7 @@ document.getElementById("message-form").addEventListener("submit",async(e)=>{
     const response = await fetch("http://localhost:3000/messages", {
         method: "POST", 
         headers: { "Content-Type": "application/json" }, 
-        body: JSON.stringify({ user, message }) 
+        body: JSON.stringify({ userID,user, message }) 
       }); 
     const text = await response.text(); 
     console.log("Server response:", text); 
