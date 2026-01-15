@@ -70,3 +70,4 @@ document.getElementById("message-form").addEventListener("submit",async(e)=>{
   });
 
 displayMessages()
+setInterval(displayMessages, 1000);
