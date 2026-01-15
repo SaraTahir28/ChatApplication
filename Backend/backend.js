@@ -1,7 +1,14 @@
 import express from "express";
 import cors from "cors";
 const app = express();
-app.use(cors());
+app.use(
+  cors({
+    origin: process.env.NODE_ENV === "production"
+      ? "https://saratahir-chatapp-frontend.codeyourfuture.io"//In production, only this domain is allowed to call your backend.
+      : "*" //“Allow requests from any origin when developing locally
+  })
+);
+
 app.use(express.json()); //parses incoming Json as js object 
 
 const port = process.env.PORT || 3000; //listen to port provided by the hosting env || local machine

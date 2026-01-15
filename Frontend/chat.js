@@ -1,3 +1,8 @@
+const API_URL =
+  window.location.hostname === "localhost"
+    ? "http://localhost:3000"
+    : "https://saratahir-chatapp-backend.hosting.codeyourfuture.io";
+
 //implementing generating userID's
 function generateUserId(){
   return crypto.randomUUID() //built-in Web API for generating random ID's
@@ -17,7 +22,7 @@ if (savedName) {
 const container = document.getElementById("messages")
 async function displayMessages(){
   try{
-  const response = await fetch("http://localhost:3000/messages") //talking to backend with a GET request, which only sends back data.
+  const response = await fetch(`${API_URL}/messages`) //talking to backend with a GET request, which only sends back data.
   const data = await response.json() //expecting data to be sent as structured JSON. 
   container.innerHTML=""
     for(const i of data){
@@ -42,7 +47,7 @@ document.getElementById("message-form").addEventListener("submit",async(e)=>{
     { alert("Both message and user are required."); return;
     }
   try { 
-    const response = await fetch("http://localhost:3000/messages", {
+    const response = await fetch(`${API_URL}/messages`, {
         method: "POST", 
         headers: { "Content-Type": "application/json" }, 
         body: JSON.stringify({ userID,user, message }) 
