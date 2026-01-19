@@ -1,41 +1,117 @@
+/* Light, airy page background */
 body {
   font-family: sans-serif;
-  max-width: 600px;
-  margin: 20px auto;
+  background: #fffefe; /* very light background */
+  margin: 0;
+  padding: 20px;
+
+  display: flex;
+  justify-content: center;   /* center horizontally */
+  align-items: flex-start;   /* start near the top */
+  min-height: 100vh;
+
+  padding-top: 60px;         /* gentle spacing from the top */
 }
 
+
+/* Floating chat card */
+#chat-app {
+  width: 100%;
+  max-width: 600px;
+  background: rgb(212, 201, 209);
+  padding: 20px;
+  border-radius: 16px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+  border: 1px solid rgba(0,0,0,0.05);
+}
+
+/* Title */
 h1 {
   text-align: center;
+  margin-top: 0;
+  margin-bottom: 20px;
+  color: #4e0244; /* seagreen accent */
 }
 
+/* Message window */
 #messages {
   list-style: none;
-  padding: 0;
-  border: 1px solid #ccc;
-  min-height: 100px;
+  padding: 12px;
   margin-bottom: 20px;
+
+  height: 180px;          /* ~4 messages visible */
+  overflow-y: auto;
+
+  background: linear-gradient(135deg, #7ac8ef, #91fbf2);
+  border-radius: 12px;
+  color: rgb(45, 0, 47);
+  font-weight: bold;
 }
 
+/* Message bubble */
 #messages li {
-  padding: 8px 10px;
-  border-bottom: 1px solid #eee;
+  background: rgba(255,255,255,0.2);
+  padding: 10px;
+  margin-bottom: 12px;
+  border-radius: 10px;
 }
 
-#messages li:last-child {
-  border-bottom: none;
+/* Username badge */
+#messages li .username {
+  display: inline-block;
+  font-weight: bold;
+  background: rgba(255,255,255,0.3);
+  padding: 3px 8px;
+  border-radius: 8px;
+  margin-right: 6px;
 }
 
+/* Form layout */
 form {
   display: flex;
   gap: 8px;
 }
 
+/* Inputs */
 form input[type="text"] {
   flex: 1;
-  padding: 6px 8px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
 }
 
+/* Send button */
 button {
-  padding: 6px 12px;
+  padding: 8px 14px;
   cursor: pointer;
+  background: #04b4c4;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-weight: bolder;
+}
+
+button:hover {
+  background: #0284c7;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 480px) {
+  #chat-app {
+    padding: 15px;
+    border-radius: 12px;
+  }
+
+  #messages {
+    height: 150px; /* slightly smaller on mobile */
+  }
+
+  form {
+    flex-direction: column;
+  }
+
+  form input[type="text"],
+  button {
+    width: 100%;
+  }
 }

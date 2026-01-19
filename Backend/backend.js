@@ -14,10 +14,20 @@ app.use(express.json()); //parses incoming Json as js object
 const port = process.env.PORT || 3000; //listen to port provided by the hosting env || local machine
 
 const messages = [] //iniializing an empty array of messages- only gets loaded with Post method for the first time 
+const callBacksForNewMessages= [] // no of callbacks in the array === no of clients/browsers currently waiting for a new message.
+
+//longpolling logic - returns only messages newer than since.
+function getMessagesSince(timestamp) {
+  if (!timestamp) return messages; // first load
+  return messages.filter(msg => msg.timestamp > timestamp);
+}
+
 
 //The users object maps each userID(becomes a key with its own object) to a user profile object.
 const users ={} 
+
 //creating a post  message route and modifying the message object 
+
 app.post("/messages", (req, res) => {
 const {userID,user, message} = req.body;    //Extracting the frontend data
 const nextID = messages.length === 0 ? 1 : messages[messages.length-1].id +1 //if no messages  id =1 else increment as messages increase.
@@ -43,12 +53,28 @@ const newMessage = {   //Building New message object
 };
 //saving it in the messages array 
 messages.push(newMessage);
-//send the new created message to frontend
-res.json(newMessage);
+while(callBacksForNewMessages.length > 0){
+  const callback = callBacksForNewMessages.pop()
+  callback([newMessage]);
+}
+res.json({ status: "ok" }); });
+
+//updating the get route to support long polling
+app.get("/messages", (req, res) => {
+  const since = Number(req.query.since) || 0; //reads since query from url and converts it into Number, if since is missing fallbacks to 0 
+
+  const newMessages = getMessagesSince(since);
+
+  if (newMessages.length > 0) {
+  //We already have new messages so respond immediately
+    return res.json(newMessages);
+  }
+
+  //Otherwise, wait for new messages
+  callBacksForNewMessages.push((messagesToSend) => {
+    res.json(messagesToSend);
+  });
 });
 
-app.get("/messages", (req, res) => {
-  res.json(messages)
-})
 app.listen(port, "0.0.0.0", () =>{ 
   console.log(`Quote server listening on port ${port}`); });
