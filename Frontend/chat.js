@@ -1,7 +1,10 @@
-const API_URL =
-  window.location.hostname === "localhost"
-    ? "http://localhost:3000"
-    : "https://saratahir-chatapp-backend.hosting.codeyourfuture.io";
+const isLocal =
+  window.location.hostname === "localhost" ||
+  window.location.hostname === "127.0.0.1";
+
+const API_URL = isLocal
+  ? "http://localhost:3000"
+  : "https://saratahir-chatapp-backend.hosting.codeyourfuture.io";
 
 //implementing generating userID's
 function generateUserId(){
@@ -20,54 +23,70 @@ if (savedName) {
 }
 
 const container = document.getElementById("messages")
-async function displayMessages(){
-  try{
-  const response = await fetch(`${API_URL}/messages`) //talking to backend with a GET request, which only sends back data.
-  const data = await response.json() //expecting data to be sent as structured JSON. 
-  container.innerHTML=""
-    for(const i of data){
-        const list = document.createElement("li")
-            list.textContent = `${i.username}: ${i.message}`;
-            container.append(list)
-    }
-}
-  catch (error) {
-  console.error("Failed to fetch messages", error);
-  container.innerHTML = "<li>Error fetching messages.</li>";
-}
+function addMessageToUI(msg){
+  const list = document.createElement("li");
+  list.textContent = `${msg.username}: ${msg.message}`;
+  container.append(list)
+  container.scrollTop = container.scrollHeight //go to bottom of container when a new message arrives.
 }
 
 document.getElementById("message-form").addEventListener("submit",async(e)=>{
   e.preventDefault() //prevents page from refreshing on form submission
   const message = document.getElementById("message").value;
   const user = document.getElementById("user").value;
+  
   localStorage.setItem("username",user)
+  
   //Adding Validation to check both author and quote are added
   if (!message.trim() || !user.trim()) 
     { alert("Both message and user are required."); return;
     }
-  try { 
+  
+    try { 
     const response = await fetch(`${API_URL}/messages`, {
         method: "POST", 
         headers: { "Content-Type": "application/json" }, 
         body: JSON.stringify({ userID,user, message }) 
       }); 
-    const text = await response.text(); 
-    console.log("Server response:", text); 
-  //show backend error message to user 
+   
+      const text = await response.text(); 
+      console.log("Server response:", text); 
+  
+      //show backend error message to user 
   if(!response.ok){
     alert("Error: " + text);
   }
-    alert("Message added!");
-     document.getElementById("message").value = ""; //clear the message field only 
-     displayMessages() 
-     } 
-     
-    catch (error) { 
+  document.getElementById("message").value = "";
+   
+  } catch (error) { 
       console.error("Failed to add message:", error);
        alert("Error adding message"); 
     } 
   });
+//imlementing longpolling- (One request stays open and completes only when a new message arrives.)
+let lastTimestamp = 0;
 
-displayMessages()
-setInterval(displayMessages, 1000);
+async function longPoll() {
+  try {
+    const url = `${API_URL}/messages?since=${lastTimestamp}`;
+    const raw = await fetch(url);
+    const newMessages = await raw.json();
+
+    if (newMessages.length > 0) {
+      for (const msg of newMessages) {
+        addMessageToUI(msg);
+        lastTimestamp = msg.timestamp;
+      }
+    }
+
+    // Immediately start the next long-poll
+    longPoll();
+
+  } catch (err) {
+    console.error("Long polling failed", err);
+    setTimeout(longPoll, 2000); // retry after delay
+  }
+}
+
+
+longPoll()
