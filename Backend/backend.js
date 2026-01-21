@@ -15,7 +15,7 @@ const port = process.env.PORT || 3000; //listen to port provided by the hosting 
 
 const messages = [] //iniializing an empty array of messages- only gets loaded with Post method for the first time 
 const callBacksForNewMessages= [] // no of callbacks in the array === no of clients/browsers currently waiting for a new message.
-
+const reactions = []
 //longpolling logic - returns only messages newer than since.
 function getMessagesSince(timestamp) {
   if (!timestamp) return messages; // first load
@@ -49,7 +49,9 @@ const newMessage = {   //Building New message object
     message: message,
     timestamp: timestamp,
     userId: userID,
-    username: users[userID].username //shows the updated name incase user changes the name 
+    username: users[userID].username,//shows the updated name incase user changes the name
+    likes:0,
+    dislikes:0 
 };
 //saving it in the messages array 
 messages.push(newMessage);
@@ -57,7 +59,46 @@ while(callBacksForNewMessages.length > 0){
   const callback = callBacksForNewMessages.pop()
   callback([newMessage]);
 }
-res.json({ status: "ok" }); });
+res.json({ status: "ok" }); 
+
+});
+
+
+//new post route for counting reactions
+app.post("/messages/:id/react", (req, res) => {
+  const id = Number(req.params.id);
+  const { type, userID } = req.body;
+
+  const message = messages.find(m => m.id === id);
+  if (!message) {
+    return res.status(404).json({ error: "Message not found" });
+  }
+
+  // Remove any previous reaction from this user for this message
+  const existing = reactions.find(r => r.messageId === id && r.userId === userID);
+  if (existing) {
+    reactions.splice(reactions.indexOf(existing), 1);
+  }
+
+  // Add the new reaction
+  reactions.push({ messageId: id, userId: userID, type });
+
+  // Recalculate counts
+  message.likes = reactions.filter(r => r.messageId === id && r.type === "likes").length;
+  message.dislikes = reactions.filter(r => r.messageId === id && r.type === "dislikes").length;
+// Update timestamp so long-poll sees this as a NEW update 
+  message.timestamp = Date.now();
+  // Notify long-poll clients
+  while (callBacksForNewMessages.length > 0) {
+    const callback = callBacksForNewMessages.pop();
+    callback([message]);
+  }
+
+  res.json({ status: "ok" });
+});
+
+
+
 
 //updating the get route to support long polling
 app.get("/messages", (req, res) => {
