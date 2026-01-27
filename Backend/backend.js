@@ -2,8 +2,6 @@ import express from "express";
 import http from "http";
 import { WebSocketServer } from "ws";
 
-
-
 import cors from "cors";
 const app = express();
 app.use(
@@ -16,10 +14,20 @@ app.use(
 
 app.use(express.json()); //parses incoming Json as js object 
 
+
 //Attached WebSocketServer to shared HTTP server
 const server = http.createServer(app)
 const wss = new WebSocketServer({server})
+const wsClients = new Set(); // Store all currently connected WebSocket clients
+wss.on("connection", (ws) => {
+  wsClients.add(ws);
+  console.log("WebSocket client connected");
 
+  ws.on("close", () => {
+    wsClients.delete(ws);
+    console.log("WebSocket client disconnected");
+  });
+});
 
 
 const port = process.env.PORT || 3000; //listen to port provided by the hosting env || local machine
@@ -27,6 +35,28 @@ const port = process.env.PORT || 3000; //listen to port provided by the hosting 
 const messages = [] //iniializing an empty array of messages- only gets loaded with Post method for the first time 
 const callBacksForNewMessages= [] // no of callbacks in the array === no of clients/browsers currently waiting for a new message.
 const reactions = []
+
+//Setting a unified broadcast function to support long polling and websockets
+
+
+function broadcast(type, message) {
+  const messageData = { type, message }
+  const json = JSON.stringify(messageData); //converting to JSON string as websockets cant send JS objects
+//sending update to all ws clients 
+  wsClients.forEach((client) => {
+    if (client.readyState === WebSocket.OPEN) {  //client.readystate is a property of websockets
+      client.send(json);
+    } 
+  });
+//sending update to all longpolling clients
+  while (callBacksForNewMessages.length > 0) {
+    const callback = callBacksForNewMessages.pop();
+    callback([messageData.message]);
+  }
+}
+
+
+
 //longpolling logic - returns only messages newer than since.
 function getMessagesSince(timestamp) {
   if (!timestamp) return messages; // first load
@@ -66,14 +96,10 @@ const newMessage = {   //Building New message object
 };
 //saving it in the messages array 
 messages.push(newMessage);
-while(callBacksForNewMessages.length > 0){
-  const callback = callBacksForNewMessages.pop()
-  callback([newMessage]);
-}
-res.json({ status: "ok" }); 
+broadcast("new-message", newMessage);
+res.json({ status: "ok" });
 
 });
-
 
 //new post route for counting reactions
 app.post("/messages/:id/react", (req, res) => {
@@ -99,16 +125,12 @@ app.post("/messages/:id/react", (req, res) => {
   message.dislikes = reactions.filter(r => r.messageId === id && r.type === "dislikes").length;
 // Update timestamp so long-poll sees this as a NEW update 
   message.timestamp = Date.now();
-  // Notify long-poll clients
-  while (callBacksForNewMessages.length > 0) {
-    const callback = callBacksForNewMessages.pop();
-    callback([message]);
-  }
 
-  res.json({ status: "ok" });
+broadcast("reaction-update", message);
+
+res.json({ status: "ok" });
+
 });
-
-
 
 
 //updating the get route to support long polling
