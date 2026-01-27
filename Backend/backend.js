@@ -1,4 +1,9 @@
 import express from "express";
+import http from "http";
+import { WebSocketServer } from "ws";
+
+
+
 import cors from "cors";
 const app = express();
 app.use(
@@ -10,6 +15,12 @@ app.use(
 );
 
 app.use(express.json()); //parses incoming Json as js object 
+
+//Attached WebSocketServer to shared HTTP server
+const server = http.createServer(app)
+const wss = new WebSocketServer({server})
+
+
 
 const port = process.env.PORT || 3000; //listen to port provided by the hosting env || local machine
 
@@ -117,5 +128,6 @@ app.get("/messages", (req, res) => {
   });
 });
 
-app.listen(port, "0.0.0.0", () =>{ 
-  console.log(`Quote server listening on port ${port}`); });
+//Replaced app.listen 
+server.listen(port, "0.0.0.0", () =>{ 
+  console.log(`server(HTTP + Websocket)running on port ${port}`); });
