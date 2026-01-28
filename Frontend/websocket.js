@@ -1,3 +1,15 @@
+//to have hostory of message on websockets version of app 
+async function loadhistory(){
+  const res = await fetch(`${API_URL}/messages?since=0`)
+  const history = await res.json();
+
+  history.forEach((msg)=>{
+    const li = addMessageToUI(msg);
+    reactionHandlers(li,msg);
+  })
+}
+loadhistory()
+
 const socket = new WebSocket(   // Connect to WebSocket server
   API_URL.replace("http", "ws") + "/ws"
 );
