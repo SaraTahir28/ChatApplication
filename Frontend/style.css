@@ -7,10 +7,10 @@ body {
 
   display: flex;
   justify-content: center;   /* center horizontally */
-  align-items: flex-start;   /* start near the top */
+  align-items: flex-start;
   min-height: 100vh;
-
-  padding-top: 60px;         /* gentle spacing from the top */
+  padding-top: 100px;
+        
 }
 
 
@@ -18,7 +18,7 @@ body {
 #chat-app {
   width: 100%;
   max-width: 600px;
-  background: rgb(212, 201, 209);
+  background: rgb(238, 218, 233);
   padding: 20px;
   border-radius: 16px;
   box-shadow: 0 8px 20px rgba(0,0,0,0.08);
@@ -39,10 +39,10 @@ h1 {
   padding: 12px;
   margin-bottom: 20px;
 
-  height: 180px;          /* ~4 messages visible */
+  height: 350px;          /* ~4 messages visible */
   overflow-y: auto;
 
-  background: linear-gradient(135deg, #7ac8ef, #91fbf2);
+  background: linear-gradient(135deg, #c3eaf1, #c5fad2);
   border-radius: 12px;
   color: rgb(45, 0, 47);
   font-weight: bold;
@@ -54,13 +54,14 @@ h1 {
   padding: 10px;
   margin-bottom: 12px;
   border-radius: 10px;
+  overflow: auto;
 }
 
 /* Username badge */
 #messages li .username {
   display: inline-block;
   font-weight: bold;
-  background: rgba(255,255,255,0.3);
+  background: rgba(126, 107, 107, 0.3);
   padding: 3px 8px;
   border-radius: 8px;
   margin-right: 6px;
@@ -142,5 +143,40 @@ button:hover {
 /* Reaction counts */
 .reactions span {
   font-size: 14px;
-  color: white;
+  color: rgb(1, 81, 26);
+}
+/* Left + right bubble alignment */
+.message {
+  max-width: 80%;
+  padding: 10px;
+  margin-bottom: 12px;
+  border-radius: 12px;
+  display: inline-block;
+  clear: both;
+}
+
+/* Messages from OTHER users → left */
+.message.left {
+  float: left;
+  border-bottom-left-radius: 0;
+   background: #f8f8d5;       /* soft pink */
+  color: #4a0033;            /* deep plum text */
+}
+
+/* Messages from YOU → right */
+.message.right {
+  float: right;
+  border-bottom-right-radius: 0;
+  background: #f8d4f5;       /* soft green */
+  color: #0a3d0a;            /* dark green text */
+}
+
+/* Username + message text colours */
+.message .username {
+  color: #4e0244;        /* deep purple */
+  font-weight: bold;
+}
+
+.message .text {
+  color: #2d002f;        /* dark plum */
 }

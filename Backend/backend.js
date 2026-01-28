@@ -1,4 +1,7 @@
 import express from "express";
+import http from "http";
+import { WebSocketServer } from "ws";
+
 import cors from "cors";
 const app = express();
 app.use(
@@ -10,12 +13,84 @@ app.use(
 );
 
 app.use(express.json()); //parses incoming Json as js object 
+//serving frontend folder
 
+app.use(express.static("Frontend"));
+
+//Attached WebSocket Setup
+
+
+const server = http.createServer(app)
+const wss = new WebSocketServer({server})
+const wsClients = new Set(); // Store all currently connected WebSocket clients
+wss.on("connection", (ws) => {
+  wsClients.add(ws);
+  console.log("WebSocket client connected");
+
+
+ws.on("message", (data)=> {
+  const {userID, user, message } = JSON.parse(data);
+
+const nextID = messages.length === 0 ? 1 : messages[messages.length-1].id +1 //if no messages  id =1 else increment as messages increase.
+const timestamp = Date.now()    //Generating a timestamps for when the server recives the message
+
+if(!Object.hasOwn(users,userID)){
+  users[userID] = {
+    userId: userID,
+    username: user
+  }
+}
+else {
+   if (users[userID].username !== user) { 
+    users[userID].username = user;
+   } 
+  }
+
+const newMessage = {   
+    id: nextID,
+    message: message,
+    timestamp: timestamp,
+    userId: userID,
+    username: users[userID].username,//shows the updated name incase user changes the name
+    likes:0,
+    dislikes:0 
+};
+//saving it in the messages array 
+messages.push(newMessage);
+broadcast("new-message", newMessage);
+})
+ws.on("close", () => {
+    wsClients.delete(ws);
+    console.log("WebSocket client disconnected");
+  });
+})
 const port = process.env.PORT || 3000; //listen to port provided by the hosting env || local machine
 
 const messages = [] //iniializing an empty array of messages- only gets loaded with Post method for the first time 
 const callBacksForNewMessages= [] // no of callbacks in the array === no of clients/browsers currently waiting for a new message.
 const reactions = []
+
+//Setting a unified broadcast function to support long polling and websockets
+
+
+function broadcast(type, message) {
+  const messageData = { type, message }
+  const json = JSON.stringify(messageData); //converting to JSON string as websockets cant send JS objects
+//sending update to all ws clients 
+  wsClients.forEach((client) => {
+    if (client.readyState === WebSocket.OPEN) {  //client.readystate is a property of websockets
+      client.send(json);
+    } 
+  });
+//sending update to all longpolling clients
+  while (callBacksForNewMessages.length > 0) {
+    const callback = callBacksForNewMessages.pop();
+    callback([messageData.message]);
+  }
+}
+
+
+
 //longpolling logic - returns only messages newer than since.
 function getMessagesSince(timestamp) {
   if (!timestamp) return messages; // first load
@@ -55,14 +130,10 @@ const newMessage = {   //Building New message object
 };
 //saving it in the messages array 
 messages.push(newMessage);
-while(callBacksForNewMessages.length > 0){
-  const callback = callBacksForNewMessages.pop()
-  callback([newMessage]);
-}
-res.json({ status: "ok" }); 
+broadcast("new-message", newMessage);
+res.json({ status: "ok" });
 
 });
-
 
 //new post route for counting reactions
 app.post("/messages/:id/react", (req, res) => {
@@ -88,16 +159,12 @@ app.post("/messages/:id/react", (req, res) => {
   message.dislikes = reactions.filter(r => r.messageId === id && r.type === "dislikes").length;
 // Update timestamp so long-poll sees this as a NEW update 
   message.timestamp = Date.now();
-  // Notify long-poll clients
-  while (callBacksForNewMessages.length > 0) {
-    const callback = callBacksForNewMessages.pop();
-    callback([message]);
-  }
 
-  res.json({ status: "ok" });
+broadcast("reaction-update", message);
+
+res.json({ status: "ok" });
+
 });
-
-
 
 
 //updating the get route to support long polling
@@ -117,5 +184,6 @@ app.get("/messages", (req, res) => {
   });
 });
 
-app.listen(port, "0.0.0.0", () =>{ 
-  console.log(`Quote server listening on port ${port}`); });
+//Replaced app.listen 
+server.listen(port, "0.0.0.0", () =>{ 
+  console.log(`server(HTTP + Websocket)running on port ${port}`); });
