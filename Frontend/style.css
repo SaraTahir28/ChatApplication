@@ -51,14 +51,20 @@ h1 {
   padding: 12px;
   margin-bottom: 20px;
 
-  max-height: calc(100vh - 360px);   /* smaller, more compact */
+  max-height: calc(100vh - 360px);
   overflow-y: auto;
 
   background: linear-gradient(135deg, #c3eaf1, #c5fad2);
   border-radius: 12px;
   color: rgb(45, 0, 47);
   font-weight: bold;
+
+  min-height: 200px;        /* ensures space before first message */
+  display: flex;            /* keeps layout stable */
+  flex-direction: column;
+  justify-content: flex-start;
 }
+
 
 
 /* Message bubble */
