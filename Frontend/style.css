@@ -1,29 +1,42 @@
 
 body {
   font-family: sans-serif;
-  background: #fffefe; /* very light background */
+  background: #fffefe;
   margin: 0;
-  padding: 20px;
 
   display: flex;
-  justify-content: center;   /* center horizontally */
+  justify-content: center;
   align-items: flex-start;
   min-height: 100vh;
-  padding-top: 100px;
-        
+
+  padding-top: 40px;   /* reduced so page stops scrolling */
 }
+
+#messages {
+  max-height: calc(100vh - 260px);
+  overflow-y: auto;
+}
+
+
 
 
 /* Floating chat card */
 #chat-app {
+  position: fixed;
+  top: 40px;          /* distance from top of screen */
+  left: 50%;
+  transform: translateX(-50%);   /* center horizontally */
+
   width: 100%;
   max-width: 600px;
+
   background: rgb(238, 218, 233);
   padding: 20px;
   border-radius: 16px;
   box-shadow: 0 8px 20px rgba(0,0,0,0.08);
   border: 1px solid rgba(0,0,0,0.05);
 }
+
 
 /* Title */
 h1 {
@@ -33,13 +46,12 @@ h1 {
   color: #4e0244; /* seagreen accent */
 }
 
-/* Message window */
 #messages {
   list-style: none;
   padding: 12px;
   margin-bottom: 20px;
 
-  height: 350px;          /* ~4 messages visible */
+  max-height: calc(100vh - 360px);   /* smaller, more compact */
   overflow-y: auto;
 
   background: linear-gradient(135deg, #c3eaf1, #c5fad2);
@@ -48,9 +60,10 @@ h1 {
   font-weight: bold;
 }
 
+
 /* Message bubble */
 #messages li {
-  background: rgba(255,255,255,0.2);
+  background: rgba(220, 220, 220, 0.2);
   padding: 10px;
   margin-bottom: 12px;
   border-radius: 10px;
@@ -180,3 +193,4 @@ button:hover {
 .message .text {
   color: #2d002f;        /* dark plum */
 }
+main { margin: 0; padding: 0; }
