@@ -26,19 +26,25 @@ const container = document.getElementById("messages")
 
 function addMessageToUI(msg){
   const list = document.createElement("li");
+
+  // Determine if this message is from the current user 
+  const isMine = msg.userId === userID;
+  
   list.dataset.id = msg.id;
 
   list.innerHTML = `
-  <div class="message-line"> 
-  <span class="username">${msg.username}</span> 
-  <span class="text">${msg.message}</span>
-  </div> 
-  <div class="reactions"> 
-  <button class="like-btn">❤️</button> 
-  <span class="like-count">${msg.likes}</span> 
-  <button class="dislike-btn">👎</button>
-  <span class="dislike-count">${msg.dislikes}</span> 
-  </div> `;
+  <div class="message ${isMine ? "right" : "left"}">
+    <span class="username">${msg.username}</span>
+    <span class="text">${msg.message}</span>
+    <div class="reactions">
+      <button class="like-btn">❤️</button>
+      <span class="like-count">${msg.likes}</span>
+      <button class="dislike-btn">👎</button>
+      <span class="dislike-count">${msg.dislikes}</span>
+    </div>
+  </div>
+`;
+
   container.append(list)
   container.scrollTop = container.scrollHeight //go to bottom of container when a new message arrives.
   return list;
