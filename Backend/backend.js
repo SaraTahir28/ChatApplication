@@ -13,9 +13,13 @@ app.use(
 );
 
 app.use(express.json()); //parses incoming Json as js object 
+//serving frontend folder
+
+app.use(express.static("Frontend"));
+
+//Attached WebSocket Setup
 
 
-//Attached WebSocketServer to shared HTTP server
 const server = http.createServer(app)
 const wss = new WebSocketServer({server})
 const wsClients = new Set(); // Store all currently connected WebSocket clients
@@ -23,13 +27,43 @@ wss.on("connection", (ws) => {
   wsClients.add(ws);
   console.log("WebSocket client connected");
 
-  ws.on("close", () => {
+
+ws.on("message", (data)=> {
+  const {userID, user, message } = JSON.parse(data);
+
+const nextID = messages.length === 0 ? 1 : messages[messages.length-1].id +1 //if no messages  id =1 else increment as messages increase.
+const timestamp = Date.now()    //Generating a timestamps for when the server recives the message
+
+if(!Object.hasOwn(users,userID)){
+  users[userID] = {
+    userId: userID,
+    username: user
+  }
+}
+else {
+   if (users[userID].username !== user) { 
+    users[userID].username = user;
+   } 
+  }
+
+const newMessage = {   
+    id: nextID,
+    message: message,
+    timestamp: timestamp,
+    userId: userID,
+    username: users[userID].username,//shows the updated name incase user changes the name
+    likes:0,
+    dislikes:0 
+};
+//saving it in the messages array 
+messages.push(newMessage);
+broadcast("new-message", newMessage);
+})
+ws.on("close", () => {
     wsClients.delete(ws);
     console.log("WebSocket client disconnected");
   });
-});
-
-
+})
 const port = process.env.PORT || 3000; //listen to port provided by the hosting env || local machine
 
 const messages = [] //iniializing an empty array of messages- only gets loaded with Post method for the first time 
