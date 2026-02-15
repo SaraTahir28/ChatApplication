@@ -1,35 +1,68 @@
+/* Landing page container */
+#landing {
+  text-align: center;
+  margin-top: 80px;
+}
 
+/* Title */
+#landing h1 {
+  font-size: 2rem;
+  color: #4e0244; /*  original purple */
+  margin-bottom: 40px;
+}
+
+/* Buttons */
+#landing button {
+  display: block;
+  width: 220px;
+  margin: 12px auto;
+  padding: 12px 18px;
+
+  background: #04b4c4;   /* original button colour */
+  color: white;
+  font-size: 1rem;
+  font-weight: bold;
+
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+
+  transition: background 0.2s ease;
+}
+
+#landing button:hover {
+  background: #0284c7;   
+}
+
+/* Make it responsive */
+@media (max-width: 480px) {
+  #landing h1 {
+    font-size: 1.6rem;
+  }
+
+  #landing button {
+    width: 90%;
+  }
+}
+
+/* Page layout */
 body {
   font-family: sans-serif;
   background: #fffefe;
   margin: 0;
+  padding: 20px;
 
   display: flex;
   justify-content: center;
   align-items: flex-start;
   min-height: 100vh;
-
-  padding-top: 40px;   /* reduced so page stops scrolling */
+  padding-top: 100px;
 }
 
-#messages {
-  max-height: calc(100vh - 260px);
-  overflow-y: auto;
-}
-
-
-
-
-/* Floating chat card */
+/* Chat card */
 #chat-app {
-  position: fixed;
-  top: 40px;          /* distance from top of screen */
-  left: 50%;
-  transform: translateX(-50%);   /* center horizontally */
-
   width: 100%;
   max-width: 600px;
-
   background: rgb(238, 218, 233);
   padding: 20px;
   border-radius: 16px;
@@ -37,62 +70,65 @@ body {
   border: 1px solid rgba(0,0,0,0.05);
 }
 
-
 /* Title */
 h1 {
   text-align: center;
-  margin-top: 0;
-  margin-bottom: 20px;
-  color: #4e0244; /* seagreen accent */
+  margin: 0 0 20px 0;
+  color: #4e0244;
 }
 
+/* Message list */
 #messages {
-  list-style: none;
-  padding: 12px;
-  margin-bottom: 20px;
-
-  max-height: calc(100vh - 360px);
-  overflow-y: auto;
-
-  background: linear-gradient(135deg, #c3eaf1, #c5fad2);
-  border-radius: 12px;
-  color: rgb(45, 0, 47);
-  font-weight: bold;
-
-  min-height: 200px;        /* ensures space before first message */
-  display: flex;            /* keeps layout stable */
+  display: flex;
   flex-direction: column;
-  justify-content: flex-start;
+  gap: 12px;
+  max-height: 60vh;
+  overflow-y: auto;
 }
-
-
 
 /* Message bubble */
-#messages li {
-  background: rgba(220, 220, 220, 0.2);
-  padding: 10px;
-  margin-bottom: 12px;
-  border-radius: 10px;
-  overflow: auto;
+.message {
+  max-width: 75%;
+  padding: 10px 14px;
+  border-radius: 12px;
+  word-wrap: break-word;
+  font-size: 1rem;
 }
 
-/* Username badge */
-#messages li .username {
-  display: inline-block;
+/* OTHER USERS (left) */
+.message.left {
+  align-self: flex-start;
+  background: #f8f8d5;      
+  color: #4a0033;           
+  border-bottom-left-radius: 0;
+}
+
+/* Me */
+.message.right {
+  align-self: flex-end;
+  background: #d4f8d4;      /* soft green */
+  color: #0a3d0a;           /* dark green text */
+  border-bottom-right-radius: 0;
+}
+
+
+/* Username colours */
+.message .username {
+  color: #4e0244;
   font-weight: bold;
-  background: rgba(126, 107, 107, 0.3);
-  padding: 3px 8px;
-  border-radius: 8px;
-  margin-right: 6px;
 }
 
-/* Form layout */
+.message .text {
+  color: #2d002f;
+}
+
+/* Form */
 form {
   display: flex;
   gap: 8px;
+  margin-top: 15px;
 }
 
-/* Inputs */
 form input[type="text"] {
   flex: 1;
   padding: 8px 10px;
@@ -100,7 +136,7 @@ form input[type="text"] {
   border: 1px solid #ccc;
 }
 
-/* Send button */
+/* Buttons */
 button {
   padding: 8px 14px;
   cursor: pointer;
@@ -115,15 +151,43 @@ button:hover {
   background: #0284c7;
 }
 
-/* Mobile responsiveness */
+/* Reactions  */
+.reactions {
+  margin-top: 6px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.reactions button {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  padding: 0;
+  line-height: 1;
+  transition: transform 0.1s ease;
+}
+
+.reactions button:active {
+  transform: scale(0.85);
+}
+
+.reactions span {
+  font-size: 14px;
+  color: rgb(1, 81, 26);
+}
+
+/* Mobile */
 @media (max-width: 480px) {
   #chat-app {
     padding: 15px;
-    border-radius: 12px;
+    max-width: 95%;
   }
 
-  #messages {
-    height: 150px; /* slightly smaller on mobile */
+  .message {
+    max-width: 90%;
+    font-size: 0.95rem;
   }
 
   form {
@@ -135,68 +199,3 @@ button:hover {
     width: 100%;
   }
 }
-/* Reaction bar under each message */
-.reactions {
-  margin-top: 6px;
-  display: flex;
-  gap: 12px;
-  align-items: center;
-}
-
-/* Reaction buttons */
-.reactions button {
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  font-size: 18px;
-  padding: 0;
-  line-height: 1;
-  transition: transform 0.1s ease;
-}
-
-/* Tiny press animation */
-.reactions button:active {
-  transform: scale(0.85);
-}
-
-/* Reaction counts */
-.reactions span {
-  font-size: 14px;
-  color: rgb(1, 81, 26);
-}
-/* Left + right bubble alignment */
-.message {
-  max-width: 80%;
-  padding: 10px;
-  margin-bottom: 12px;
-  border-radius: 12px;
-  display: inline-block;
-  clear: both;
-}
-
-/* Messages from OTHER users → left */
-.message.left {
-  float: left;
-  border-bottom-left-radius: 0;
-   background: #f8f8d5;       /* soft pink */
-  color: #4a0033;            /* deep plum text */
-}
-
-/* Messages from YOU → right */
-.message.right {
-  float: right;
-  border-bottom-right-radius: 0;
-  background: #f8d4f5;       /* soft green */
-  color: #0a3d0a;            /* dark green text */
-}
-
-/* Username + message text colours */
-.message .username {
-  color: #4e0244;        /* deep purple */
-  font-weight: bold;
-}
-
-.message .text {
-  color: #2d002f;        /* dark plum */
-}
-main { margin: 0; padding: 0; }
