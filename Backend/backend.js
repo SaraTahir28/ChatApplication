@@ -1,6 +1,6 @@
 import express from "express";
 import http from "http";
-import { WebSocketServer } from "ws";
+import { WebSocketServer,WebSocket } from "ws";
 
 import cors from "cors";
 const app = express();

@@ -57,6 +57,7 @@ function reactionHandlers(li, msg){
  const likeCount = li.querySelector(".like-count");
  const dislikeCount = li.querySelector(".dislike-count");
  const previous = localStorage.getItem(`reaction-${msg.id}`);
+ 
 
 if (previous === "likes") {
   likeBtn.disabled = true;
@@ -81,7 +82,7 @@ function handleReaction(id, type, likeBtn, dislikeBtn) {
     dislikeBtn.disabled = true;
     likeBtn.disabled = false;
   }
-
+localStorage.setItem(`reaction-${id}`, type);
   sendReactionToServer(id, type);
 }
 
