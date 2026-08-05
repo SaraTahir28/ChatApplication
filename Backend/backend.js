@@ -7,7 +7,7 @@ const app = express();
 app.use(
   cors({
     origin: process.env.NODE_ENV === "production"
-      ? "https://saratahir-chatapp-frontend.hosting.codeyourfuture.io/"//In production, only this domain is allowed to call your backend.
+      ? "https://saratahir-chatapp-frontend.grads.hosting.cyf.academy"  //In production, only this domain is allowed to call your backend.
       : "*" //“Allow requests from any origin when developing locally
   })
 );

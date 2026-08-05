@@ -4,7 +4,7 @@ const isLocal =
 
 const API_URL = isLocal
   ? "http://localhost:3000"
-  : "https://saratahir-chatapp-backend.hosting.codeyourfuture.io";
+  : "https://saratahir-chatapp-backend.grads.hosting.cyf.academy";
 
 //implementing generating userID's
 function generateUserId(){
