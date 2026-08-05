@@ -4,8 +4,8 @@ A lightweight, full‑stack chat application supporting **Long‑Polling** and *
 
 Hosted on Coolify:
 
-- **Frontend:** https://saratahir-chatapp-frontend.hosting.codeyourfuture.io  
-- **Backend:** https://saratahir-chatapp-backend.hosting.codeyourfuture.io  
+- **Frontend:** (https://saratahir-chatapp-frontend.grads.hosting.cyf.academy)
+- **Backend:** (https://saratahir-chatapp-backend.grads.hosting.cyf.academy)
 
 This project demonstrates two real‑time communication strategies side‑by‑side, making it ideal for learning, teaching, or comparing transport layers.
 
